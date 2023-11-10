@@ -64,12 +64,12 @@ jobs:
         sudo chown $USER:$GROUPS /workdir
 
     - name: Clone source code
-      #working-directory: /workdir
+      working-directory: /workdir
       run: |
         df -hT $PWD
         echo git clone $REPO_URL --depth 1 -b $REPO_BRANCH openwrt
         git clone $REPO_URL --depth 1 -b $REPO_BRANCH openwrt
-        #ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+        ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
 
     - name: Load custom feeds
