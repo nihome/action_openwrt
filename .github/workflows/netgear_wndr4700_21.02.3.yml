@@ -31,8 +31,8 @@ env:
   PATCH_DTS: 21.02.3__dts__netgear-wndr4700.dts
   PATCH_NAND: 21.02.3__image__nand.mk
   FEEDS_CONF: feeds.conf.default
-  DIY_P1_SH: diy-part0.sh
-  DIY_P2_SH: diy-part2.sh
+  DIY_FEEDS: diy_feeds.sh
+  DIY_BASE_FILES: diy-base-files.sh
   UPLOAD_BIN_DIR: true
   UPLOAD_FIRMWARE: true
   UPLOAD_COWTRANSFER: false
@@ -64,34 +64,30 @@ jobs:
         sudo chown $USER:$GROUPS /workdir
 
     - name: Clone source code
-      working-directory: /workdir
+      #working-directory: /workdir
       run: |
         df -hT $PWD
         echo git clone $REPO_URL --depth 1 -b $REPO_BRANCH openwrt
         git clone $REPO_URL --depth 1 -b $REPO_BRANCH openwrt
-        ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+        #ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
 
     - name: Load custom feeds
       run: |
         [ -f $FEEDS_CONF ] && cp $FEEDS_CONF openwrt/feeds.conf.default
-        #chmod +x $DIY_P1_SH
+        #chmod +x $DIY_FEEDS
         #cd openwrt
-        #$GITHUB_WORKSPACE/$DIY_P1_SH
+        #$GITHUB_WORKSPACE/$DIY_FEEDS
 
-    - name: Update feeds
-      run: cd openwrt && ./scripts/feeds update -a
-
-    - name: Install feeds
-      run: cd openwrt && ./scripts/feeds install -a
+    - name: Update and install feeds
+      run: |
+      cd openwrt
+      ./scripts/feeds update -a
+      ./scripts/feeds install -a
 
     - name: Load custom configuration
       run: |
-        #[ -e files ] && mv files openwrt/files
-        [ -f $GITHUB_WORKSPACE/conf/$CONFIG_FILE ] && cp $GITHUB_WORKSPACE/conf/$CONFIG_FILE openwrt/.config
-        #chmod +x $DIY_P2_SH
-        #cd openwrt
-        #$GITHUB_WORKSPACE/$DIY_P2_SH
+        [ -f ./conf/$CONFIG_FILE ] && cp ./conf/$CONFIG_FILE openwrt/.config
 
     - name: SSH connection to Actions
       uses: P3TERX/ssh2actions@v1.0.0
@@ -111,9 +107,16 @@ jobs:
 
     - name: Patch DTS NAND FILES
       run: |
-        [ -f $GITHUB_WORKSPACE/patch/$PATCH_DTS ] && cp $GITHUB_WORKSPACE/patch/$PATCH_DTS openwrt/target/linux/apm821xx/dts/netgear-wndr4700.dts
-        [ -f $GITHUB_WORKSPACE/patch/$PATCH_NAND ] && cp $GITHUB_WORKSPACE/patch/$PATCH_NAND openwrt/target/linux/apm821xx/image/nand.mk
-        [ -d $GITHUB_WORKSPACE/files/$PATCH_FILES ] && cp -r $GITHUB_WORKSPACE/files/$PATCH_FILES/* openwrt/target/linux/apm821xx/base-files/
+        [ -f ./patch/$PATCH_DTS ] && cp ./patch/$PATCH_DTS openwrt/target/linux/apm821xx/dts/netgear-wndr4700.dts
+        [ -f ./patch/$PATCH_NAND ] && cp ./patch/$PATCH_NAND openwrt/target/linux/apm821xx/image/nand.mk
+
+    - name: Custom Base Files
+      run: |
+        [ -d ./files/$PATCH_FILES ] && cp -r ./files/$PATCH_FILES/* openwrt/target/linux/apm821xx/base-files/
+        #chmod +x $DIY_BASE_FILES
+        #cd openwrt
+        #$GITHUB_WORKSPACE/$DIY_BASE_FILES
+
 
     - name: Compile the firmware
       id: compile
@@ -142,7 +145,7 @@ jobs:
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
         cd openwrt/bin/targets/*/*
-        rm -rf packages
+        #rm -rf packages
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "::set-output name=status::success"
 
