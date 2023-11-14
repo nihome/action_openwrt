@@ -27,7 +27,7 @@ env:
   PATCH_DTS: 21.02.3__dts__netgear-wndr4700.dts
   PATCH_NAND: 21.02.3__image__nand.mk
   FEEDS_CONF: feeds.conf.default
-  DIY_FEEDS: diy_feeds.sh
+  DIY_FEEDS: diy-feeds.sh
   DIY_BASE_FILES: diy-base-files.sh
   UPLOAD_BIN_DIR: true
   UPLOAD_FIRMWARE: true
@@ -67,7 +67,7 @@ jobs:
         [ -e $FEEDS_CONF ] && cp $FEEDS_CONF openwrt/feeds.conf.default
         chmod +x $DIY_FEEDS
         cd openwrt
-        #$GITHUB_WORKSPACE/$DIY_FEEDS
+        $GITHUB_WORKSPACE/$DIY_FEEDS
 
     - name: Update and install feeds
       run: |
@@ -97,10 +97,9 @@ jobs:
     - name: Custom Base Files
       run: |
         [ -d ./files/$PATCH_FILES ] && cp -r ./files/$PATCH_FILES/* openwrt/target/linux/apm821xx/base-files/
-        #chmod +x $DIY_BASE_FILES
-        #cd openwrt
-        #$GITHUB_WORKSPACE/$DIY_BASE_FILES
-
+        chmod +x $DIY_BASE_FILES
+        cd openwrt
+        $GITHUB_WORKSPACE/$DIY_BASE_FILES
 
     - name: Compile the firmware
       id: compile
