@@ -128,7 +128,7 @@ jobs:
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
         name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
-        path: openwrt/bin/targets/apm821xx/nand/	openwrt/bin/packages/powerpc_464fp/
+        path: openwrt/bin/ #openwrt/bin/targets/apm821xx/nand/	#openwrt/bin/packages/powerpc_464fp/
         if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
 
     - name: Organize files
