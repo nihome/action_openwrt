@@ -120,8 +120,8 @@ jobs:
       if: (!cancelled())
       run: |
         df -hT
-        ls -l openwrt/bin/targets/apm821xx/nand/
-        du openwrt/bin/packages/powerpc_464fp/
+        #ls -l openwrt/bin/targets/apm821xx/nand/
+        #du openwrt/bin/packages/powerpc_464fp/
 
     - name: Upload bin directory
       uses: actions/upload-artifact@v3
